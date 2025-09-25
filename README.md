@@ -172,3 +172,4 @@ ISC License - feel free to use this project for personal or commercial purposes.
 ## Contributing
 
 Feel free to submit issues, feature requests, or pull requests to improve this application!
+# Smart_Expense_Tracker
