@@ -1,0 +1,174 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>AI Expense Tracker</title>
+<link rel="stylesheet" href="style.css" />
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.3.0/dist/chart.umd.min.js"></script>
+</head>
+<body>
+<div class="container">
+<div class="layout">
+  <aside class="sidebar">
+    <div class="brand">💸 AI Tracker</div>
+    <nav class="nav">
+      <button class="nav-item active" id="nav-dashboard">Dashboard</button>
+      <button class="nav-item" id="nav-insights">AI Insights</button>
+      <button class="nav-item" id="nav-add-expense">Add Expense</button>
+    </nav>
+    <div class="sidebar-footer">
+      <button class="sidebar-theme" id="dark-toggle">Toggle Dark</button>
+    </div>
+  </aside>
+
+  <main class="content">
+  <header class="topbar">
+    <h1>AI Expense Tracker</h1>
+    <div class="controls">
+      <input id="search-input" placeholder="Search expenses..." />
+      <button id="export-csv">Export CSV</button>
+      <input id="import-file" type="file" accept=".csv" />
+      <button id="import-btn">Import CSV</button>
+    </div>
+    <div class="user-info">
+      <div class="user-avatar" id="user-avatar"></div>
+      <span id="user-name"></span>
+      <button class="logout-btn" id="logout-btn">Logout</button>
+    </div>
+  </header>
+
+
+<section class="add">
+<form id="add-form">
+<input id="input-description" placeholder="e.g. Lunch $12 at Subway" />
+<input id="input-amount" placeholder="Amount (optional)" type="number" step="0.01" />
+<input id="input-date" type="date" />
+<button>Add Expense</button>
+</form>
+</section>
+
+
+<section class="filters">
+<select id="filter-category"><option value="">All Categories</option></select>
+<input id="start-date" type="date" />
+<input id="end-date" type="date" />
+<button id="apply-filters">Apply</button>
+</section>
+
+
+<section class="stats" id="stats-bar" style="display:none">
+<div class="stat-item"><span class="stat-label">Total</span><span class="stat-value" id="stat-total">$0</span></div>
+<div class="stat-item"><span class="stat-label">Entries</span><span class="stat-value" id="stat-count">0</span></div>
+<div class="stat-item"><span class="stat-label">Avg</span><span class="stat-value" id="stat-avg">$0</span></div>
+</section>
+
+<section class="dashboard-header">
+  <div class="cards" id="metric-cards">
+    <div class="card">
+      <div class="card-label">Total This Month</div>
+      <div class="card-value" id="card-total-month">$0</div>
+    </div>
+    <div class="card">
+      <div class="card-label">Avg / Day</div>
+      <div class="card-value" id="card-avg-day">$0</div>
+    </div>
+    <div class="card">
+      <div class="card-label">Top Category</div>
+      <div class="card-value" id="card-top-category">—</div>
+    </div>
+    <div class="card">
+      <div class="card-label">Budget Used</div>
+      <div class="card-value" id="card-budget-used">0%</div>
+      <div class="progress"><div class="progress-bar" id="budget-progress" style="width:0%"></div></div>
+    </div>
+  </div>
+
+  <div class="toolbar">
+    <div class="chips">
+      <button class="chip active" data-filter="month" id="chip-month">This Month</button>
+      <button class="chip" data-filter="30" id="chip-30">Last 30 Days</button>
+      <button class="chip" data-filter="week" id="chip-week">This Week</button>
+      <button class="chip" id="chip-clear">Clear</button>
+    </div>
+    <div class="sorter">
+      <label for="sort-select">Sort</label>
+      <select id="sort-select">
+        <option value="date-desc">Newest</option>
+        <option value="date-asc">Oldest</option>
+        <option value="amount-desc">Amount (High → Low)</option>
+        <option value="amount-asc">Amount (Low → High)</option>
+      </select>
+    </div>
+    <div class="budget">
+      <label for="budget-input">Monthly Budget</label>
+      <input id="budget-input" type="number" min="0" step="0.01" placeholder="e.g. 1000" />
+      <button id="budget-save">Save</button>
+    </div>
+  </div>
+</section>
+
+<section class="main" id="section-dashboard">
+<div class="list">
+<ul id="expense-list"></ul>
+</div>
+<div class="chart">
+<canvas id="expenseChart"></canvas>
+</div>
+ </section>
+
+ <section class="ai-insights" id="section-insights" style="display:none">
+ <h2>🤖 AI Insights</h2>
+ <div class="insights-container">
+ <div class="ai-suggestions">
+ <h3>Smart Suggestions</h3>
+ <div id="suggestions-list"></div>
+ </div>
+ <div class="ai-trends">
+ <h3>Spending Trends</h3>
+ <div id="trends-info"></div>
+ </div>
+ <div class="ai-query">
+ <h3>Ask AI</h3>
+ <div class="query-container">
+ <input id="ai-query-input" placeholder="Ask about your spending patterns..." />
+ <button id="ai-query-btn">Ask</button>
+ </div>
+ <div id="ai-query-response"></div>
+ </div>
+ </div>
+ </section>
+
+  </main>
+</div>
+
+<!-- Floating Action Button -->
+<button class="fab" id="fab-add" aria-label="Add Expense">+</button>
+
+<!-- Modal: Add Expense -->
+<div class="modal" id="modal-add" aria-hidden="true">
+  <div class="modal-backdrop" id="modal-backdrop"></div>
+  <div class="modal-dialog" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+    <div class="modal-header">
+      <h3 id="modal-title">Add Expense</h3>
+      <button class="modal-close" id="modal-close" aria-label="Close">✕</button>
+    </div>
+    <form id="add-form" class="modal-body">
+      <input id="input-description" placeholder="e.g. Lunch $12 at Subway" />
+      <div class="modal-row">
+        <input id="input-amount" placeholder="Amount" type="number" step="0.01" />
+        <input id="input-date" type="date" />
+      </div>
+      <button class="modal-submit">Add Expense</button>
+    </form>
+  </div>
+   </div>
+
+</div>
+
+
+<script src="auth.js"></script>
+<script src="charts.js"></script>
+<script src="script.js"></script>
+</body>
+</html>
