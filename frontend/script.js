@@ -1,5 +1,18 @@
 // 🔹 Replace this with your deployed backend URL
-const API_URL = "https://smart-expense-tracker-ai.onrender.com/api/expenses";
+const API_BASE = "https://smart-expense-tracker-ai.onrender.com";
+const EXPENSES_URL = `${API_BASE}/api/expenses`;
+
+// Example fetch all expenses
+async function fetchExpenses() {
+  const res = await fetch(EXPENSES_URL, {
+    headers: {
+      Authorization: `Bearer ${localStorage.getItem('token')}`
+    }
+  });
+  const data = await res.json();
+  return data;
+}
+
 
 // Check authentication on page load
 if (!window.authManager.isAuthenticated()) {
