@@ -30,8 +30,8 @@ if (!fs.existsSync(tmpDir)) {
 }
 
 // CSV upload endpoint (delegate to expenses controller)
-const { importCSV } = require("./controllers/expensesController");
-app.post("/api/upload-csv", upload.single("file"), importCSV);
+// const { importCSV } = require("./controllers/expensesController");
+// app.post("/api/upload-csv", upload.single("file"), importCSV);
 
 // Routes
 app.use("/api/auth", authRouter);
