@@ -1,7 +1,9 @@
+// backend/server.js
 const express = require("express");
 const cors = require("cors");
 const multer = require("multer");
 const path = require("path");
+const fs = require("fs");
 require("dotenv").config();
 
 // Database connection
@@ -11,41 +13,36 @@ const connectDB = require("./config/database");
 const expensesRouter = require("./routes/expenses");
 const authRouter = require("./routes/auth");
 
-
+// Initialize app
 const app = express();
-app.use(cors());
+app.use(cors({
+  origin: process.env.ALLOWED_ORIGIN || "*"
+}));
 app.use(express.json());
 
-// Serve static files from frontend directory
-app.use(express.static(path.join(__dirname, "../frontend")));
-
-
-// file upload middleware for CSV import
+// File upload middleware for CSV import
 const upload = multer({ dest: path.join(__dirname, "tmp") });
 
 // Ensure tmp directory exists
 const tmpDir = path.join(__dirname, "tmp");
-if (!require("fs").existsSync(tmpDir)) {
-  require("fs").mkdirSync(tmpDir, { recursive: true });
+if (!fs.existsSync(tmpDir)) {
+  fs.mkdirSync(tmpDir, { recursive: true });
 }
 
-// CSV upload endpoint - delegates to expenses router
-app.post("/api/upload-csv", upload.single("file"), (req, res) => {
-  if (!req.file) {
-    return res.status(400).json({ error: "No file uploaded" });
-  }
-  
-  // Redirect to expenses import endpoint
-  const expensesRouter = require("./routes/expenses");
-  expensesRouter(req, res);
-});
-
+// CSV upload endpoint (delegate to expenses controller)
+const { importCSV } = require("./controllers/expensesController");
+app.post("/api/upload-csv", upload.single("file"), importCSV);
 
 // Routes
 app.use("/api/auth", authRouter);
 app.use("/api/expenses", expensesRouter);
 
-// Connect to database and start server
+// Health check (for Render uptime checks)
+app.get("/health", (req, res) => {
+  res.json({ status: "ok", uptime: process.uptime() });
+});
+
+// Connect to DB and start server
 const PORT = process.env.PORT || 5000;
 
 const startServer = async () => {
@@ -53,11 +50,9 @@ const startServer = async () => {
     await connectDB();
     app.listen(PORT, () => {
       console.log(`🚀 Server running on http://localhost:${PORT}`);
-      console.log(`📊 Database: MongoDB Atlas`);
-      console.log(`🔐 Authentication: JWT enabled`);
     });
   } catch (error) {
-    console.error('❌ Failed to start server:', error);
+    console.error("❌ Failed to start server:", error);
     process.exit(1);
   }
 };

@@ -1,4 +1,5 @@
-const API_URL = "http://localhost:5000/api/expenses";
+// 🔹 Replace this with your deployed backend URL
+const API_URL = "https://expense-tracker-backend.onrender.com/api/expenses";
 
 // Check authentication on page load
 if (!window.authManager.isAuthenticated()) {
@@ -195,7 +196,6 @@ applyFilters.addEventListener("click", () => {
   const start = startDate.value;
   const end = endDate.value;
 
-  // Build query string
   const params = new URLSearchParams();
   if (category) params.append("category", category);
   if (start) params.append("startDate", start);
@@ -224,6 +224,9 @@ darkToggle.addEventListener("click", () => {
 if (localStorage.getItem("darkMode") === "true") {
   document.body.classList.add("dark-mode");
 }
+
+// --- AI FEATURES (same as your code) ---
+
 
 // AI Features
 const aiQueryInput = document.getElementById("ai-query-input");
