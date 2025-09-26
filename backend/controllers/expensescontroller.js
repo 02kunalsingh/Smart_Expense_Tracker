@@ -20,7 +20,7 @@ exports.importCSV = async (req, res) => {
         } catch (err) {
           res.status(500).json({ error: "Failed to save expenses" });
         } finally {
-          fs.unlinkSync(req.file.path); // cleanup
+          fs.unlinkSync(req.file.path); 
         }
       });
   } catch (error) {
