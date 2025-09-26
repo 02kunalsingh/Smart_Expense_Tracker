@@ -1,5 +1,5 @@
 // 🔹 Replace this with your deployed backend URL
-const API_URL = "https://expense-tracker-backend.onrender.com/api/expenses";
+const API_URL = "https://smart-expense-tracker-ai.onrender.com/api/expenses";
 
 // Check authentication on page load
 if (!window.authManager.isAuthenticated()) {
