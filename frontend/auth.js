@@ -99,5 +99,4 @@ class AuthManager {
     return this.user;
   }
 }
-
-window.PushManager = new AuthManager();
+window.authManager = new AuthManager();

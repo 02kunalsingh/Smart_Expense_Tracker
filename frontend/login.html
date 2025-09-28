@@ -50,7 +50,7 @@
         .addEventListener("submit", async (e) => {
           e.preventDefault();
 
-          const email = document.getElementById("email").value;
+          const email = document.getElementById("email").value.trim();
           const password = document.getElementById("password").value;
           const loginBtn = document.getElementById("login-btn");
           const btnText = loginBtn.querySelector(".btn-text");
@@ -65,19 +65,19 @@
 
           try {
             const result = await window.authManager.login(email, password);
+            console.log("Login result:", result);
+
             if (result.success) {
               window.location.href = "index.html";
             } else {
               errorMessage.textContent = result.error;
               errorMessage.style.display = "block";
-              console.error("Login error:", result.error);
             }
           } catch (err) {
+            console.error(err);
             errorMessage.textContent = "An error occurred. Please try again.";
             errorMessage.style.display = "block";
-            console.error(err);
           } finally {
-            // Hide loading state
             loginBtn.disabled = false;
             btnText.style.display = "inline";
             btnLoading.style.display = "none";
