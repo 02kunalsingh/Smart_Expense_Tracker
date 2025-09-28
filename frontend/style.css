@@ -6,7 +6,8 @@
 
 body {
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  background: #f4f6f9;
+  background: -webkit-linear-gradient(135deg, #455ecb 0%, #6b4295 100%);
+  color: #111827;
   margin: 0;
   padding: 20px;
   transition: background-color 0.3s ease, color 0.3s ease;
@@ -18,8 +19,8 @@ body.dark-mode {
 }
 
 .container {
-  max-width: 1200px;
-  margin: 0 auto;
+  /* max-width: 1200px; */
+  /* margin: 0 auto; */
   background: white;
   border-radius: 12px;
   box-shadow: 0 2px 8px rgba(0,0,0,0.1);
@@ -33,7 +34,7 @@ body.dark-mode .container {
 /* Layout */
 .layout {
   display: grid;
-  grid-template-columns: 240px 1fr;
+  grid-template-columns: 200px 1fr;
 }
 
 @media (max-width: 900px) {
@@ -660,19 +661,26 @@ body.dark-mode .ai-loading {
   justify-content: center;
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   padding: 20px;
-}
-
-.auth-card {
-  background: white;
-  border-radius: 12px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-  padding: 40px;
-  width: 100%;
-  max-width: 400px;
+  position: relative;
 }
 
 body.dark-mode .auth-container {
   background: linear-gradient(135deg, #4a5568 0%, #2d3748 100%);
+}
+
+.auth-card {
+  background: white;
+  border-radius: 20px;
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.2);
+  padding: 40px 30px;
+  width: 100%;
+  max-width: 380px; /* smaller width for no scrolling on big screens */
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.auth-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 25px 50px rgba(0, 0, 0, 0.25);
 }
 
 body.dark-mode .auth-card {
@@ -682,18 +690,22 @@ body.dark-mode .auth-card {
 
 .auth-header {
   text-align: center;
-  margin-bottom: 30px;
+  margin-bottom: 25px;
 }
 
 .auth-header h1 {
   color: #667eea;
   font-size: 2rem;
-  margin-bottom: 10px;
+  margin-bottom: 8px;
+}
+
+body.dark-mode .auth-header h1 {
+  color: #9f7aea;
 }
 
 .auth-header p {
   color: #666;
-  font-size: 1rem;
+  font-size: 0.95rem;
 }
 
 body.dark-mode .auth-header p {
@@ -702,28 +714,25 @@ body.dark-mode .auth-header p {
 
 .auth-form {
   display: flex;
-  
   flex-direction: column;
-  gap: 20px;
+  gap: 18px;
 }
 
 .form-row {
   display: grid;
-  flex-direction: column;
-  /* grid-template-columns: 1fr 1fr; */
-  gap: 15px;
+  gap: 12px;
 }
 
 .form-group {
   display: flex;
   flex-direction: column;
-  gap: 5px;
+  gap: 4px;
 }
 
 .form-group label {
   font-weight: 500;
   color: #333;
-  font-size: 0.9rem;
+  font-size: 0.875rem;
 }
 
 body.dark-mode .form-group label {
@@ -733,9 +742,9 @@ body.dark-mode .form-group label {
 .form-group input {
   padding: 12px;
   border: 2px solid #e1e5e9;
-  border-radius: 6px;
-  font-size: 1rem;
-  transition: border-color 0.3s ease;
+  border-radius: 10px;
+  font-size: 0.95rem;
+  transition: border-color 0.3s ease, background 0.3s ease;
 }
 
 body.dark-mode .form-group input {
@@ -747,6 +756,7 @@ body.dark-mode .form-group input {
 .form-group input:focus {
   outline: none;
   border-color: #667eea;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.3);
 }
 
 .form-hint {
@@ -759,21 +769,25 @@ body.dark-mode .form-hint {
   color: #999;
 }
 
+/* Gradient Button */
 .auth-btn {
-  background: #667eea;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   color: white;
   border: none;
-  padding: 12px 24px;
-  border-radius: 6px;
+  padding: 12px 20px;
+  border-radius: 12px;
   font-size: 1rem;
-  font-weight: 500;
+  font-weight: 600;
   cursor: pointer;
-  transition: background 0.3s ease;
+  transition: all 0.3s ease;
   margin-top: 10px;
+  text-transform: uppercase;
 }
 
 .auth-btn:hover:not(:disabled) {
-  background: #5a67d8;
+  background: linear-gradient(135deg, #5a67d8 0%, #6b46c1 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
 }
 
 .auth-btn:disabled {
@@ -784,7 +798,7 @@ body.dark-mode .form-hint {
 .auth-footer {
   text-align: center;
   margin-top: 20px;
-  padding-top: 20px;
+  padding-top: 15px;
   border-top: 1px solid #e1e5e9;
 }
 
@@ -794,7 +808,7 @@ body.dark-mode .auth-footer {
 
 .auth-footer p {
   color: #666;
-  font-size: 0.9rem;
+  font-size: 0.875rem;
 }
 
 body.dark-mode .auth-footer p {
@@ -814,9 +828,9 @@ body.dark-mode .auth-footer p {
 .error-message {
   background: #fed7d7;
   color: #c53030;
-  padding: 12px;
-  border-radius: 6px;
-  font-size: 0.9rem;
+  padding: 10px;
+  border-radius: 10px;
+  font-size: 0.875rem;
   text-align: center;
   border: 1px solid #feb2b2;
 }
@@ -826,6 +840,14 @@ body.dark-mode .error-message {
   color: #fc8181;
   border-color: #744210;
 }
+
+/* Responsive: keep container centered on small screens */
+@media (max-height: 700px) {
+  .auth-card {
+    padding: 30px 20px;
+  }
+}
+
 
 /* Main app authentication */
 .app-header {

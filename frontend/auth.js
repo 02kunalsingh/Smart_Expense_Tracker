@@ -1,11 +1,11 @@
-// Authentication utilities
+const API_BASE = "https://smart-expense-tracker-ai.onrender.com";
+
 class AuthManager {
   constructor() {
     this.token = localStorage.getItem('token');
     this.user = JSON.parse(localStorage.getItem('user') || 'null');
   }
 
-  // Set authentication data
   setAuth(token, user) {
     this.token = token;
     this.user = user;
@@ -13,7 +13,6 @@ class AuthManager {
     localStorage.setItem('user', JSON.stringify(user));
   }
 
-  // Clear authentication data
   clearAuth() {
     this.token = null;
     this.user = null;
@@ -21,17 +20,14 @@ class AuthManager {
     localStorage.removeItem('user');
   }
 
-  // Check if user is authenticated
   isAuthenticated() {
     return !!this.token;
   }
 
-  // Get authorization header
   getAuthHeader() {
     return this.token ? { 'Authorization': `Bearer ${this.token}` } : {};
   }
 
-  // API request with authentication
   async apiRequest(url, options = {}) {
     const headers = {
       'Content-Type': 'application/json',
@@ -39,10 +35,7 @@ class AuthManager {
       ...options.headers
     };
 
-    const response = await fetch(url, {
-      ...options,
-      headers
-    });
+    const response = await fetch(url, { ...options, headers });
 
     if (response.status === 401) {
       this.clearAuth();
@@ -56,11 +49,9 @@ class AuthManager {
   // Login user
   async login(email, password) {
     try {
-      const response = await fetch('http://localhost:5000/api/auth/login', {
+      const response = await fetch(`${API_BASE}/api/auth/login`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password })
       });
 
@@ -80,11 +71,9 @@ class AuthManager {
   // Register user
   async register(email, password, firstName, lastName) {
     try {
-      const response = await fetch('http://localhost:5000/api/auth/register', {
+      const response = await fetch(`${API_BASE}/api/auth/register`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password, firstName, lastName })
       });
 
@@ -101,17 +90,14 @@ class AuthManager {
     }
   }
 
-  // Logout user
   logout() {
     this.clearAuth();
     window.location.href = '/login.html';
   }
 
-  // Get current user
   getCurrentUser() {
     return this.user;
   }
 }
 
-// Create global auth manager instance
-window.authManager = new AuthManager();
+window.PushManager = new AuthManager();

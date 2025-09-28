@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 
 const connectDB = async () => {
   try {
-    const defaultAtlasUri = 'mongodb+srv://Kunal:Kunal123@cluster0.qi3td3a.mongodb.net/expense-tracker-ai?retryWrites=true&w=majority&appName=Cluster0';
+    const defaultAtlasUri = 'mongodb+srv://Kunal:Kunal123@expensetracker.5hl93yk.mongodb.net/?retryWrites=true&w=majority&appName=ExpenseTracker';
     const mongoURI = process.env.MONGODB_URI || defaultAtlasUri;
 
     const conn = await mongoose.connect(mongoURI);

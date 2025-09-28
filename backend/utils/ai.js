@@ -255,7 +255,7 @@ function generateSmartSuggestions(expenses) {
   if (avgMonthly > 0) {
     suggestions.push({
       type: 'budget',
-      message: `Your average monthly spending is ₹${avgMonthly.toFixed(2)}`,
+      message: `Your average monthly spending is $${avgMonthly.toFixed(2)}`,
       recommendation: 'Consider setting a monthly budget to track your expenses better'
     });
   }
@@ -267,7 +267,7 @@ function generateSmartSuggestions(expenses) {
   if (topCategory && topCategory[1] > avgMonthly * 0.3) {
     suggestions.push({
       type: 'category',
-      message: `${topCategory[0]} is your highest spending category (Rs${topCategory[1].toFixed(2)})`,
+      message: `${topCategory[0]} is your highest spending category ($${topCategory[1].toFixed(2)})`,
       recommendation: 'Consider reviewing expenses in this category for potential savings'
     });
   }
