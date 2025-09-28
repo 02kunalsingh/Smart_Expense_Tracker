@@ -60,7 +60,7 @@ const expenseSchema = new mongoose.Schema({
   recurringPattern: {
     type: String,
     enum: ['daily', 'weekly', 'monthly', 'yearly'],
-    default: null
+    default: undefined
   },
   createdAt: {
     type: Date,

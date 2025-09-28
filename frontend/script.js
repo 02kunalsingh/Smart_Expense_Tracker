@@ -138,7 +138,11 @@ form.addEventListener("submit", async (e) => {
       method: "POST",
       body: JSON.stringify({ 
         description: description.trim(),
-        amount: amount || null,
+        amount: amount ? parseFloat(amount) : null,
+        category: "Other",
+        // Temporary workaround for backend enum default issue
+        // Remove this once backend is redeployed with fixed schema
+        recurringPattern: "monthly",
         date: date || null
       })
     });
