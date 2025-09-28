@@ -2,7 +2,8 @@ let expenseChart = null;
 
 async function loadCharts() {
   try {
-    const res = await window.authManager.apiRequest("http://localhost:5000/api/expenses/summary");
+    const base = window.API_BASE || "http://localhost:5000";
+    const res = await window.authManager.apiRequest(`${base}/api/expenses/summary`);
     const data = await res.json();
     
     const ctx = document.getElementById("expenseChart");

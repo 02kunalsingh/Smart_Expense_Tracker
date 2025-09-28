@@ -1,4 +1,5 @@
-const API_BASE = "https://smart-expense-tracker-ai.onrender.com";
+// Deployed backend
+window.API_BASE = "https://smart-expense-tracker-ai.onrender.com";
 
 class AuthManager {
   constructor() {
@@ -49,7 +50,7 @@ class AuthManager {
   // Login user
   async login(email, password) {
     try {
-      const response = await fetch(`${API_BASE}/api/auth/login`, {
+      const response = await fetch(`${window.API_BASE}/api/auth/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password })
@@ -71,7 +72,7 @@ class AuthManager {
   // Register user
   async register(email, password, firstName, lastName) {
     try {
-      const response = await fetch(`${API_BASE}/api/auth/register`, {
+      const response = await fetch(`${window.API_BASE}/api/auth/register`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password, firstName, lastName })

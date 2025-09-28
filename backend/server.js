@@ -20,6 +20,10 @@ app.use(cors({
 }));
 app.use(express.json());
 
+// Serve static frontend files
+const frontendDir = path.join(__dirname, "../frontend");
+app.use(express.static(frontendDir));
+
 // File upload middleware for CSV import
 const upload = multer({ dest: path.join(__dirname, "tmp") });
 
@@ -40,6 +44,11 @@ app.use("/api/expenses", expensesRouter);
 // Health check (for Render uptime checks)
 app.get("/health", (req, res) => {
   res.json({ status: "ok", uptime: process.uptime() });
+});
+
+// Root: send login page
+app.get("/", (req, res) => {
+  res.sendFile(path.join(frontendDir, "login.html"));
 });
 
 // Connect to DB and start server

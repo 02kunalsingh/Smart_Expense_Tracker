@@ -1,5 +1,5 @@
-// 🔹 Replace this with your deployed backend URL
-const API_BASE = "https://smart-expense-tracker-ai.onrender.com";
+// Backend base URL comes from auth.js (window.API_BASE)
+const API_BASE = window.API_BASE || "http://localhost:5000";
 
 // Auth routes
 const AUTH_URL = `${API_BASE}/api/auth`;
@@ -21,7 +21,7 @@ async function fetchExpenses() {
 
 
 // Check authentication on page load
-if (!window.PushManager.isAuthenticated()) {
+if (!window.authManager.isAuthenticated()) {
   window.location.href = '/login.html';
 }
 
@@ -63,7 +63,7 @@ let currentFilter = 'month';
 
 // Load user info and setup UI
 function setupUserInfo() {
-  const user = window.PushManager.getCurrentUser();
+  const user = window.authManager.getCurrentUser();
   if (user) {
     userAvatar.textContent = user.firstName.charAt(0).toUpperCase();
     userName.textContent = `${user.firstName} ${user.lastName}`;
@@ -73,7 +73,7 @@ function setupUserInfo() {
 // Load expenses and display them
 async function loadExpenses() {
   try {
-    const res = await window.PushManager.apiRequest(EXPENSES_URL);
+    const res = await window.authManager.apiRequest(EXPENSES_URL);
     const data = await res.json();
     allExpenses = Array.isArray(data) ? data : [];
     displayExpenses(data);
@@ -134,7 +134,7 @@ form.addEventListener("submit", async (e) => {
   }
 
   try {
-    const response = await window.PushManager.apiRequest(EXPENSES_URL, {
+    const response = await window.authManager.apiRequest(EXPENSES_URL, {
       method: "POST",
       body: JSON.stringify({ 
         description: description.trim(),
@@ -162,7 +162,7 @@ async function deleteExpense(id) {
   }
 
   try {
-    const response = await window.PushManager.apiRequest(`${EXPENSES_URL}/${id}`, { method: "DELETE" });
+    const response = await window.authManager.apiRequest(`${EXPENSES_URL}/${id}`, { method: "DELETE" });
     if (response.ok) {
       loadExpenses();
     } else {
@@ -263,12 +263,12 @@ const sectionInsights = document.getElementById("section-insights");
 async function loadAIInsights() {
   try {
     // Load suggestions
-    const suggestionsRes = await window.PushManager.apiRequest(`${EXPENSES_URL}/ai/suggestions`);
+    const suggestionsRes = await window.authManager.apiRequest(`${EXPENSES_URL}/ai/suggestions`);
     const suggestionsData = await suggestionsRes.json();
     displaySuggestions(suggestionsData.suggestions);
 
     // Load trends
-    const trendsRes = await window.PushManager.apiRequest(`${EXPENSES_URL}/ai/trends`);
+    const trendsRes = await window.authManager.apiRequest(`${EXPENSES_URL}/ai/trends`);
     const trendsData = await trendsRes.json();
     displayTrends(trendsData.trends);
   } catch (error) {
@@ -325,7 +325,7 @@ aiQueryBtn.addEventListener("click", async () => {
     aiQueryBtn.textContent = "Thinking...";
     aiQueryResponse.innerHTML = '<div class="ai-loading">🤔 Analyzing your spending patterns...</div>';
 
-    const response = await window.PushManager.apiRequest(`${EXPENSES_URL}/ai/query`, {
+    const response = await window.authManager.apiRequest(`${EXPENSES_URL}/ai/query`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ query })
@@ -359,7 +359,7 @@ aiQueryInput.addEventListener("keypress", (e) => {
 
 // Logout functionality
 logoutBtn.addEventListener("click", () => {
-  window.PushManager.logout();
+  window.authManager.logout();
 });
 
 // Load expenses and AI insights on page load

@@ -168,46 +168,72 @@ router.delete("/:id", authenticateToken, async (req, res) => {
 
 
 // Export CSV
-router.get("/export/csv", (req, res) => {
-const items = loadExpenses();
-const parser = new Parser();
-const csv = parser.parse(items);
-res.header("Content-Type", "text/csv");
-res.attachment("expenses.csv");
-res.send(csv);
+// Export CSV (authenticated)
+router.get("/export/csv", authenticateToken, async (req, res) => {
+  try {
+    const items = await loadExpenses(req.user._id);
+    const fields = ["amount","description","category","date","merchant"]; 
+    const parser = new Parser({ fields });
+    const csv = parser.parse(items.map(e => ({
+      amount: e.amount,
+      description: e.description,
+      category: e.category,
+      date: new Date(e.date).toISOString(),
+      merchant: e.merchant || ""
+    })));
+    res.header("Content-Type", "text/csv");
+    res.attachment("expenses.csv");
+    res.send(csv);
+  } catch (error) {
+    console.error("Error exporting CSV:", error);
+    res.status(500).json({ error: "Failed to export CSV" });
+  }
 });
 
 
 // Export JSON
-router.get("/export/json", (req, res) => {
-const items = loadExpenses();
-res.json(items);
+// Export JSON (authenticated)
+router.get("/export/json", authenticateToken, async (req, res) => {
+  try {
+    const items = await loadExpenses(req.user._id);
+    res.json(items);
+  } catch (error) {
+    res.status(500).json({ error: "Failed to export JSON" });
+  }
 });
 
 
 // Import CSV endpoint (multipart/form-data file field `file`)
-router.post("/import/csv", upload.single("file"), (req, res) => {
-if (!req.file) return res.status(400).json({ error: "No file" });
-const results = [];
-fs.createReadStream(req.file.path)
-.pipe(csvParser())
-.on("data", (data) => results.push(data))
-.on("end", () => {
-// Map CSV rows to expense objects (expecting columns: amount,description,category,date)
-const current = loadExpenses();
-const normalized = results.map(r => ({
-id: Date.now() + Math.floor(Math.random() * 10000),
-amount: parseFloat(r.amount) || 0,
-description: r.description || "",
-category: r.category || "Other",
-date: r.date ? new Date(r.date).toISOString() : new Date().toISOString()
-}));
-const merged = current.concat(normalized);
-saveExpenses(merged);
-// cleanup uploaded file
-try { fs.unlinkSync(req.file.path); } catch(e){}
-res.json({ imported: normalized.length });
-});
+// Import CSV (authenticated)
+router.post("/import/csv", authenticateToken, upload.single("file"), async (req, res) => {
+  try {
+    if (!req.file) return res.status(400).json({ error: "No file" });
+    const results = [];
+    fs.createReadStream(req.file.path)
+      .pipe(csvParser())
+      .on("data", (data) => results.push(data))
+      .on("end", async () => {
+        try {
+          const normalized = results.map(r => ({
+            amount: parseFloat(r.amount) || 0,
+            description: r.description || "",
+            category: r.category || "Other",
+            date: r.date ? new Date(r.date).toISOString() : new Date().toISOString(),
+            merchant: r.merchant || null
+          }));
+          const docs = await Expense.insertMany(normalized.map(n => ({ ...n, userId: req.user._id })));
+          res.json({ imported: docs.length });
+        } catch (e) {
+          console.error("Import error:", e);
+          res.status(500).json({ error: "Failed to import CSV" });
+        } finally {
+          try { fs.unlinkSync(req.file.path); } catch(e){}
+        }
+      });
+  } catch (error) {
+    console.error("Error importing CSV:", error);
+    res.status(500).json({ error: "Failed to import CSV" });
+  }
 });
 
 
@@ -412,9 +438,9 @@ router.get("/ai/optimization", authenticateToken, async (req, res) => {
 });
 
 // AI-powered goal setting endpoint
-router.get("/ai/goals", async (req, res) => {
+router.get("/ai/goals", authenticateToken, async (req, res) => {
   try {
-    const expenses = loadExpenses();
+    const expenses = await loadExpenses(req.user._id);
     const goals = await aiUtils.generateExpenseGoals(expenses);
     res.json({ goals });
   } catch (error) {
@@ -424,9 +450,9 @@ router.get("/ai/goals", async (req, res) => {
 });
 
 // AI-powered expense comparison endpoint
-router.get("/ai/benchmark", async (req, res) => {
+router.get("/ai/benchmark", authenticateToken, async (req, res) => {
   try {
-    const expenses = loadExpenses();
+    const expenses = await loadExpenses(req.user._id);
     const benchmark = req.query.benchmark || "national_average";
     const comparison = await aiUtils.compareExpenses(expenses, benchmark);
     res.json({ comparison });
@@ -437,7 +463,7 @@ router.get("/ai/benchmark", async (req, res) => {
 });
 
 // AI-powered receipt analysis endpoint
-router.post("/ai/receipt", async (req, res) => {
+router.post("/ai/receipt", authenticateToken, async (req, res) => {
   try {
     const { receiptText } = req.body;
     
@@ -449,19 +475,14 @@ router.post("/ai/receipt", async (req, res) => {
     
     if (analysis) {
       // Auto-create expense from receipt analysis
-      const expense = {
-        id: Date.now() + Math.floor(Math.random() * 10000),
+      const expense = await saveExpense({
         amount: parseFloat(analysis.amount) || 0,
         description: analysis.items ? analysis.items.join(", ") : "Receipt purchase",
         category: analysis.category || "Other",
         date: analysis.date || new Date().toISOString(),
         merchant: analysis.merchant || null
-      };
-      
-      const expenses = loadExpenses();
-      expenses.push(expense);
-      saveExpenses(expenses);
-      
+      }, req.user._id);
+
       res.json({ 
         analysis, 
         createdExpense: expense,
@@ -480,9 +501,9 @@ router.post("/ai/receipt", async (req, res) => {
 });
 
 // AI-powered comprehensive dashboard endpoint
-router.get("/ai/dashboard", async (req, res) => {
+router.get("/ai/dashboard", authenticateToken, async (req, res) => {
   try {
-    const expenses = loadExpenses();
+    const expenses = await loadExpenses(req.user._id);
     
     // Get all AI insights in parallel
     const [
